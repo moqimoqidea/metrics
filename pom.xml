@@ -4,7 +4,7 @@
 
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-parent</artifactId>
-    <version>4.2.20-SNAPSHOT</version>
+    <version>4.2.31-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Metrics Parent</name>
     <description>
@@ -28,6 +28,7 @@
         <module>metrics-httpclient5</module>
         <module>metrics-httpasyncclient</module>
         <module>metrics-jakarta-servlet</module>
+        <module>metrics-jakarta-servlet6</module>
         <module>metrics-jakarta-servlets</module>
         <module>metrics-jcache</module>
         <module>metrics-jcstress</module>
@@ -46,28 +47,31 @@
         <module>metrics-logback</module>
         <module>metrics-logback13</module>
         <module>metrics-logback14</module>
+        <module>metrics-logback15</module>
         <module>metrics-servlet</module>
         <module>metrics-servlets</module>
     </modules>
 
     <properties>
-        <project.build.outputTimestamp>2023-06-01T21:07:48Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-01-14T10:38:11Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jackson.version>2.12.3</jackson.version>
-        <jetty9.version>9.4.51.v20230217</jetty9.version>
-        <jetty10.version>10.0.15</jetty10.version>
-        <jetty11.version>11.0.15</jetty11.version>
+        <jetty9.version>9.4.57.v20241219</jetty9.version>
+        <jetty10.version>10.0.24</jetty10.version>
+        <jetty11.version>11.0.24</jetty11.version>
+        <jetty12.version>12.0.16</jetty12.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <assertj.version>3.24.2</assertj.version>
-        <byte-buddy.version>1.14.5</byte-buddy.version>
-        <mockito.version>5.3.1</mockito.version>
-        <junit.version>4.13.1</junit.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <errorprone.version>2.19.1</errorprone.version>
+        <assertj.version>3.27.2</assertj.version>
+        <byte-buddy.version>1.15.11</byte-buddy.version>
+        <mockito.version>5.15.2</mockito.version>
+        <junit.version>4.13.2</junit.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <errorprone.version>2.31.0</errorprone.version>
         <errorprone.javac.version>9+181-r4173-1</errorprone.javac.version>
+        <servlet6.version>6.1.0</servlet6.version>
+        <awaitility.version>4.2.2</awaitility.version>
 
         <sonar.projectKey>dropwizard_metrics</sonar.projectKey>
         <sonar.organization>dropwizard</sonar.organization>
@@ -160,6 +164,10 @@
             <activation>
                 <jdk>[17,)</jdk>
             </activation>
+            <modules>
+                <module>metrics-jetty12</module>
+                <module>metrics-jetty12-ee10</module>
+            </modules>
             <build>
                 <plugins>
                     <plugin>
@@ -201,15 +209,12 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <gpg.keyname>EDA86E9FB607B5FC9223FB767D4868B53E31E7AD</gpg.keyname>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>3.3.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -222,13 +227,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.5.0</version>
-                        <configuration>
-                            <source>8</source>
-                            <doclint>none</doclint>
-                            <quiet>true</quiet>
-                            <notimestamp>true</notimestamp>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -241,12 +239,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.7</version>
                         <configuration>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
+                            <signer>bc</signer>
+                            <bestPractices>true</bestPractices>
                         </configuration>
                         <executions>
                             <execution>
@@ -261,7 +257,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.13</version>
+                        <version>1.7.0</version>
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
@@ -280,7 +276,7 @@
                     <plugin>
                         <groupId>org.cyclonedx</groupId>
                         <artifactId>cyclonedx-maven-plugin</artifactId>
-                        <version>2.7.9</version>
+                        <version>2.9.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -306,7 +302,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.11.2</version>
+                    <configuration>
+                        <source>8</source>
+                        <doclint>none</doclint>
+                        <quiet>true</quiet>
+                        <notimestamp>true</notimestamp>
+                        <legacyMode>true</legacyMode>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -315,8 +323,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>8</release>
                     <fork>true</fork>
                     <parameters>true</parameters>
                     <showWarnings>true</showWarnings>
@@ -356,7 +363,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.5.2</version>
                 <configuration>
                     <argLine>@{argLine} -Djava.net.preferIPv4Stack=true</argLine>
                 </configuration>
@@ -364,7 +371,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -382,7 +389,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.8.1</version>
                 <executions>
                     <execution>
                         <id>analyze</id>
@@ -402,7 +409,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
@@ -413,7 +420,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -428,7 +435,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.6.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
@@ -437,17 +444,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.21.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>3.4.4</version>
+                <version>3.8.0</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.12</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>

@@ -5,7 +5,7 @@
     <parent>
         <groupId>io.dropwizard.metrics</groupId>
         <artifactId>metrics-parent</artifactId>
-        <version>4.2.20-SNAPSHOT</version>
+        <version>4.2.31-SNAPSHOT</version>
     </parent>
 
     <artifactId>metrics-httpclient5</artifactId>
@@ -18,7 +18,7 @@
 
     <properties>
         <javaModuleName>com.codahale.metrics.httpclient</javaModuleName>
-        <http-client.version>5.2.1</http-client.version>
+        <http-client.version>5.4.1</http-client.version>
     </properties>
 
     <dependencyManagement>
@@ -38,7 +38,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.core5</groupId>
                 <artifactId>httpcore5</artifactId>
-                <version>5.2.1</version>
+                <version>5.3.2</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
@@ -74,12 +74,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
@@ -100,7 +94,7 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
